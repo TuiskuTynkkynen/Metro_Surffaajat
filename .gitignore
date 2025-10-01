@@ -1,3 +1,6 @@
 # Directories
 .vs/
 .git/
+.idea/
+metro_surffaajat/bin
+metro_surffaajat/obj
