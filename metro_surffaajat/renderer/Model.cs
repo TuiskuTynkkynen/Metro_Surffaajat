@@ -34,6 +34,8 @@ public class Model(ModelType type)
     public void Render(ArraySegment<GameObject> gameObjects, Matrix4X4<float> ViewPerspectiveMatrix)
     {
         SubModel[] subModels = ModelData.GetSubModels(Type);
+        Polygon[] shapes = new Polygon[subModels.Length];
+        Tuple<float, int>[] indices = new Tuple<float, int>[subModels.Length];
         
         Debug.Assert(subModels.Length == gameObjects.Count);
 
@@ -61,10 +63,21 @@ public class Model(ModelType type)
             
                 polygonVertices[vertexIndex] = new Vector(vertex.X / vertex.W, vertex.Y / vertex.W);
             }
+
+            float distance = (new Vector4D<float>(subModels[i].Position, 1.0f) * modelTransform * ViewPerspectiveMatrix).X;
+            indices[i] = new Tuple<float, int>(float.Abs(distance), i);
             
-            Polygon shape = new Polygon(new ShapeCache(polygonVertices, Meshes.GetMeshIndices(subModels[i].Type)));
-            gameObjects[i].Shape = shape;
-            gameObjects[i].Color = subModels[i].Color;
+            shapes[i] = new Polygon(new ShapeCache(polygonVertices, Meshes.GetMeshIndices(subModels[i].Type)));
+        }
+
+        Array.Sort(indices, (a, b) => Comparer<float>.Default.Compare(b.Item1, a.Item1));
+
+        for (int i = 0; i < indices.Length; i++)
+        {
+            int index = indices[i].Item2;
+            
+            gameObjects[i].Shape = shapes[index];
+            gameObjects[i].Color = subModels[index].Color;
             gameObjects[i].Size = new Vector(100, 100);
         }
     }
