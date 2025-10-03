@@ -40,34 +40,17 @@ public class Model(ModelType type)
         Debug.Assert(subModels.Length == gameObjects.Count);
 
         Matrix4X4<float> modelTransform = Matrix4X4.CreateTranslation(Position);
-        modelTransform = modelTransform * Matrix4X4.CreateFromYawPitchRoll(Rotation.X, Rotation.Y, Rotation.Z);
-        modelTransform = modelTransform * Matrix4X4.CreateScale(Scale);
+        modelTransform *= Matrix4X4.CreateFromYawPitchRoll(Rotation.X, Rotation.Y, Rotation.Z);
+        modelTransform *= Matrix4X4.CreateScale(Scale);
 
+        Matrix4X4<float> mvp = modelTransform * ViewPerspectiveMatrix;
+        
         for (int i = 0; i < subModels.Length; i++)
-        {
-            Matrix4X4<float> transformation = subModels[i].Transform * modelTransform *  ViewPerspectiveMatrix;
-            Vector3D<float>[] meshVertices = Meshes.GetMeshVertices(subModels[i].Type);
-            
-            Vector[] polygonVertices = new Vector[meshVertices.Length];
-            for (uint vertexIndex = 0; vertexIndex < meshVertices.Length; vertexIndex++)
-            {
-                Vector4D<float> vertex = new Vector4D<float>(meshVertices[vertexIndex], 1.0f);
-                vertex *= transformation;
-
-                // Fixes clipping issues when object is behind camera
-                if (vertex.Z <= 0.0f)
-                {
-                    const float epsilon = 1e-5f;
-                    vertex.W = epsilon;
-                }
-            
-                polygonVertices[vertexIndex] = new Vector(vertex.X / vertex.W, vertex.Y / vertex.W);
-            }
-
-            float distance = (new Vector4D<float>(subModels[i].Position, 1.0f) * modelTransform * ViewPerspectiveMatrix).X;
+        { 
+            float distance = (new Vector4D<float>(subModels[i].Position, 1.0f) * mvp).X;
             indices[i] = new Tuple<float, int>(float.Abs(distance), i);
             
-            shapes[i] = new Polygon(new ShapeCache(polygonVertices, Meshes.GetMeshIndices(subModels[i].Type)));
+            shapes[i] = subModels[i].ToPolygon(mvp);
         }
 
         Array.Sort(indices, (a, b) => Comparer<float>.Default.Compare(b.Item1, a.Item1));
@@ -114,6 +97,31 @@ internal class SubModel
         {
             Transform *= Matrix4X4.CreateScale(scale.Value);
         }
+    }
+    
+
+    public Polygon ToPolygon(Matrix4X4<float> modelViewPerspectiveMatrix)
+    {
+        Matrix4X4<float> transformation = Transform * modelViewPerspectiveMatrix;
+        Vector3D<float>[] meshVertices = Meshes.GetMeshVertices(Type);
+            
+        Vector[] polygonVertices = new Vector[meshVertices.Length];
+        for (uint vertexIndex = 0; vertexIndex < meshVertices.Length; vertexIndex++)
+        {
+            Vector4D<float> vertex = new Vector4D<float>(meshVertices[vertexIndex], 1.0f);
+            vertex *= transformation;
+
+            // Fixes clipping issues when object is behind camera
+            if (vertex.Z <= 0.0f)
+            {
+                const float epsilon = 1e-5f;
+                vertex.W = epsilon;
+            }
+            
+            polygonVertices[vertexIndex] = new Vector(vertex.X / vertex.W, vertex.Y / vertex.W);
+        }
+
+        return new Polygon(new ShapeCache(polygonVertices, Meshes.GetMeshIndices(Type)));
     }
 }
 
