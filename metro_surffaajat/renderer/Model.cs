@@ -76,7 +76,7 @@ internal class SubModel
     public readonly MeshType Type;
     public readonly Color Color;
     public readonly Matrix4X4<float> Transform = Matrix4X4<float>.Identity;
-    
+    public readonly Vector3D<float> Position;
 
     public SubModel(MeshType type, Color color)
     {
@@ -85,11 +85,22 @@ internal class SubModel
     }
     
     
-    public SubModel(MeshType type, Color color, Matrix4X4<float> transform)
+    public SubModel(MeshType type, Color color, Vector3D<float>? position = null, Vector3D<float>? rotation = null, Vector3D<float>? scale = null)
     {
         Type = type;
         Color = color;
-        Transform = transform;
+        Position = position ?? Vector3D<float>.Zero;
+        
+        Transform = Matrix4X4.CreateTranslation(Position);
+        if (rotation.HasValue)
+        {
+            Transform *= Matrix4X4.CreateFromYawPitchRoll(rotation.Value.X, rotation.Value.Y, rotation.Value.Z);
+        }
+
+        if (scale.HasValue)
+        {
+            Transform *= Matrix4X4.CreateScale(scale.Value);
+        }
     }
 }
 
@@ -102,11 +113,11 @@ internal static class ModelData
                 new SubModel(MeshType.Cube, Color.White)
             ] },
         { ModelType.BlueCube, [
-                new SubModel(MeshType.Cube, Color.Blue, Matrix4X4.CreateFromYawPitchRoll(25.0f, 45.0f, 90.0f))
+                new SubModel(MeshType.Cube, Color.Blue)
             ] },
         { ModelType.DualCube, [
-            new SubModel(MeshType.Cube, Color.White, Matrix4X4.CreateTranslation(-2.0f, 0.0f, 0.0f)),
-            new SubModel(MeshType.Cube, Color.Blue, Matrix4X4.CreateFromYawPitchRoll(25.0f, 45.0f, 90.0f)),
+            new SubModel(MeshType.Cube, Color.White, position: new Vector3D<float>(-2.0f, 0.0f, 0.0f)),
+            new SubModel(MeshType.Cube, Color.Blue, rotation: new Vector3D<float>(25.0f, 45.0f, 90.0f)),
         ] },
     };
 
