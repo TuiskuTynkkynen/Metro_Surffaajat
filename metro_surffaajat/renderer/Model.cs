@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using Jypeli;
@@ -9,6 +10,7 @@ public enum ModelType
 {
     WhiteCube,
     BlueCube,
+    DualCube,
     Invalid,
 }
 
@@ -20,32 +22,34 @@ public class Model(ModelType type)
     public Vector3D<float> Scale = Vector3D<float>.One;
 
     private ModelType Type { get; } = type;
+    
+    
 
     public int GetSubModelCount()
     {
         return  ModelData.GetSubModels(Type).Length;
     }
     
+    
     public void Render(ArraySegment<GameObject> gameObjects, Matrix4X4<float> ViewPerspectiveMatrix)
     {
         SubModel[] subModels = ModelData.GetSubModels(Type);
         
-        // TODO handle multiple submeshes
-        Debug.Assert(subModels.Length == 1);
+        Debug.Assert(subModels.Length == gameObjects.Count);
 
         Matrix4X4<float> modelTransform = Matrix4X4.CreateTranslation(Position);
         modelTransform = modelTransform * Matrix4X4.CreateFromYawPitchRoll(Rotation.X, Rotation.Y, Rotation.Z);
         modelTransform = modelTransform * Matrix4X4.CreateScale(Scale);
 
-        foreach (var subModel in subModels)
+        for (int i = 0; i < subModels.Length; i++)
         {
-            Matrix4X4<float> transformation = subModel.Transform * modelTransform *  ViewPerspectiveMatrix;
-            Vector3D<float>[] meshVertices = Meshes.GetMeshVertices(subModel.Type);
+            Matrix4X4<float> transformation = subModels[i].Transform * modelTransform *  ViewPerspectiveMatrix;
+            Vector3D<float>[] meshVertices = Meshes.GetMeshVertices(subModels[i].Type);
             
             Vector[] polygonVertices = new Vector[meshVertices.Length];
-            for (uint i = 0; i < meshVertices.Length; i++)
+            for (uint vertexIndex = 0; vertexIndex < meshVertices.Length; vertexIndex++)
             {
-                Vector4D<float> vertex = new Vector4D<float>(meshVertices[i], 1.0f);
+                Vector4D<float> vertex = new Vector4D<float>(meshVertices[vertexIndex], 1.0f);
                 vertex *= transformation;
 
                 // Fixes clipping issues when object is behind camera
@@ -55,12 +59,13 @@ public class Model(ModelType type)
                     vertex.W = epsilon;
                 }
             
-                polygonVertices[i] = new Vector(vertex.X / vertex.W, vertex.Y / vertex.W);
+                polygonVertices[vertexIndex] = new Vector(vertex.X / vertex.W, vertex.Y / vertex.W);
             }
             
-            Polygon shape = new Polygon(new ShapeCache(polygonVertices, Meshes.GetMeshIndices(subModel.Type)));
-            gameObject.Shape = shape;
-            gameObject.Color = subModel.Color;
+            Polygon shape = new Polygon(new ShapeCache(polygonVertices, Meshes.GetMeshIndices(subModels[i].Type)));
+            gameObjects[i].Shape = shape;
+            gameObjects[i].Color = subModels[i].Color;
+            gameObjects[i].Size = new Vector(100, 100);
         }
     }
 }
@@ -71,6 +76,7 @@ internal class SubModel
     public readonly MeshType Type;
     public readonly Color Color;
     public readonly Matrix4X4<float> Transform = Matrix4X4<float>.Identity;
+    
 
     public SubModel(MeshType type, Color color)
     {
@@ -98,6 +104,10 @@ internal static class ModelData
         { ModelType.BlueCube, [
                 new SubModel(MeshType.Cube, Color.Blue, Matrix4X4.CreateFromYawPitchRoll(25.0f, 45.0f, 90.0f))
             ] },
+        { ModelType.DualCube, [
+            new SubModel(MeshType.Cube, Color.White, Matrix4X4.CreateTranslation(-2.0f, 0.0f, 0.0f)),
+            new SubModel(MeshType.Cube, Color.Blue, Matrix4X4.CreateFromYawPitchRoll(25.0f, 45.0f, 90.0f)),
+        ] },
     };
 
     
