@@ -20,8 +20,13 @@ public class Model(ModelType type)
     public Vector3D<float> Scale = Vector3D<float>.One;
 
     private ModelType Type { get; } = type;
+
+    public int GetSubModelCount()
+    {
+        return  ModelData.GetSubModels(Type).Length;
+    }
     
-    public void Render(ref GameObject gameObject, Matrix4X4<float> ViewPerspectiveMatrix)
+    public void Render(ArraySegment<GameObject> gameObjects, Matrix4X4<float> ViewPerspectiveMatrix)
     {
         SubModel[] subModels = ModelData.GetSubModels(Type);
         
