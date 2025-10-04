@@ -43,12 +43,12 @@ public class MetroSurffaajat : PhysicsGame
         _cube = new Model(ModelType.DualCube);
         _cube.Position.Z = -2.0f;
         
-        Matrix4X4<float> perspective = Matrix4X4.CreatePerspective(0.1f, 0.1f, 0.1f, 1000f);
+        Camera3D camera = new Camera3D(new Vector3D<float>(0.0f, 1.0f, 0.0f), pitch: -45.0f);
         
         Timer.CreateAndStart(0.016, delegate
         {
             ArraySegment<GameObject> view = new ArraySegment<GameObject>(_objectPool, 0, _cube.GetSubModelCount());
-            _cube.Render(view, perspective);
+            _cube.Render(view, camera.ViewPerspectiveMatrix);
         });
         
         Keyboard.Listen(Key.W, ButtonState.Down, delegate { _cube.Position.Z += 0.1f; }, null);
