@@ -78,6 +78,7 @@ internal class SubModel
     {
         Type = type;
         Color = color;
+        Position = Vector3D<float>.Zero;
     }
     
     
