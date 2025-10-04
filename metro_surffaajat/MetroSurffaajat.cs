@@ -29,7 +29,8 @@ public class MetroSurffaajat : PhysicsGame
     
     
     /// <summary>
-    /// Initialization method for MetroSurffaajat
+    /// Jypeli PhysicsGame initialization that is automatically called by the library.
+    /// Initializes state, input and game update timer.
     /// </summary>
     public override void Begin()
     {

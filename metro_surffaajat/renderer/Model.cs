@@ -6,6 +6,10 @@ using Silk.NET.Maths;
 
 namespace Metro_Surffaajat.renderer;
 
+/// <summary>
+/// Currently implemented models.
+/// Invalid represents mesh with no SubModels. 
+/// </summary>
 public enum ModelType
 {
     WhiteCube,
@@ -15,23 +19,51 @@ public enum ModelType
 }
 
 
+/// @author Tuisku Tynkkynen
+/// @version 01.10.2025
+/// <summary>
+/// Structure for storing Models with 3D transformations and ModelType.
+/// Does not own any SubModels or mesh data.
+/// </summary>
 public class Model(ModelType type)
 {
+    /// <summary>
+    /// The 3D position of the Model.
+    /// </summary>
     public Vector3D<float> Position = Vector3D<float>.Zero;
+    /// <summary>
+    /// The 3D rotation of the Model.
+    /// </summary>
     public Vector3D<float> Rotation = Vector3D<float>.Zero;
+    /// <summary>
+    /// The 3D scale of the Model.
+    /// </summary>
     public Vector3D<float> Scale = Vector3D<float>.One;
 
+    /// <summary>
+    /// Type of Model. Used for querying SubModels.
+    /// </summary>
     private ModelType Type { get; } = type;
     
     
-
+    /// <summary>
+    /// Getter for SubModel count.
+    /// </summary>
+    /// <returns>The number of SubModels the Model has</returns>
     public int GetSubModelCount()
     {
         return  ModelData.GetSubModels(Type).Length;
     }
     
     
-    public void Render(ArraySegment<GameObject> gameObjects, Matrix4X4<float> ViewPerspectiveMatrix)
+    /// <summary>
+    /// Transforms the Model's meshes by the transform and provided matrix and
+    /// updates the provided GameObjects to represent the Model.
+    /// The Model's meshes are sorted from farthest to nearest.
+    /// </summary>
+    /// <param name="gameObjects">ArraySegment of GameObjects. Must be the same size as the Model's SubModel count</param>
+    /// <param name="viewPerspectiveMatrix">External transform matrix</param>
+    public void Render(ArraySegment<GameObject> gameObjects, Matrix4X4<float> viewPerspectiveMatrix)
     {
         SubModel[] subModels = ModelData.GetSubModels(Type);
         Polygon[] shapes = new Polygon[subModels.Length];
@@ -43,7 +75,7 @@ public class Model(ModelType type)
         modelTransform *= Matrix4X4.CreateFromYawPitchRoll(Rotation.X, Rotation.Y, Rotation.Z);
         modelTransform *= Matrix4X4.CreateScale(Scale);
 
-        Matrix4X4<float> mvp = modelTransform * ViewPerspectiveMatrix;
+        Matrix4X4<float> mvp = modelTransform * viewPerspectiveMatrix;
         
         for (int i = 0; i < subModels.Length; i++)
         { 
@@ -67,13 +99,37 @@ public class Model(ModelType type)
 }
 
 
+/// @author Tuisku Tynkkynen
+/// @version 01.10.2025
+/// <summary>
+/// Structure for storing SubModel transform data and mesh type.
+/// Does not own any mesh data.
+/// </summary>
 internal class SubModel
 {
+    /// <summary>
+    /// Type of mesh. Used for querying mesh data. 
+    /// </summary>
     public readonly MeshType Type;
+    /// <summary>
+    /// Color of SubModel.
+    /// </summary>
     public readonly Color Color;
+    /// <summary>
+    /// The 3D transform of the SubModel.
+    /// </summary>
     public readonly Matrix4X4<float> Transform = Matrix4X4<float>.Identity;
+    /// <summary>
+    /// The position of SubModel. Used for depth sorting.
+    /// </summary>
     public readonly Vector3D<float> Position;
 
+    
+    /// <summary>
+    /// Constructor for SubModel without 3D transform.
+    /// </summary>
+    /// <param name="type">Type of mesh used</param>
+    /// <param name="color">Color of the SubModel</param>
     public SubModel(MeshType type, Color color)
     {
         Type = type;
@@ -82,6 +138,14 @@ internal class SubModel
     }
     
     
+    /// <summary>
+    /// Constructor for SubModel with 3D transform.
+    /// </summary>
+    /// <param name="type">Type of mesh used</param>
+    /// <param name="color">Color of the SubModel</param>
+    /// <param name="position">3D position of the submodel</param>
+    /// <param name="rotation">3D rotation of the submodel</param>
+    /// <param name="scale">3D scale of the submodel</param>
     public SubModel(MeshType type, Color color, Vector3D<float>? position = null, Vector3D<float>? rotation = null, Vector3D<float>? scale = null)
     {
         Type = type;
@@ -101,6 +165,12 @@ internal class SubModel
     }
     
 
+    /// <summary>
+    /// Transforms SubModel mesh by its transform and the provided matrix and creates a polygon from the result.
+    /// Does not mutate the SubModel.
+    /// </summary>
+    /// <param name="modelViewPerspectiveMatrix">External transform matrix</param>
+    /// <returns>Polygon with transformed vertices</returns>
     public Polygon ToPolygon(Matrix4X4<float> modelViewPerspectiveMatrix)
     {
         Matrix4X4<float> transformation = Transform * modelViewPerspectiveMatrix;
@@ -127,8 +197,16 @@ internal class SubModel
 }
 
 
+/// @author Tuisku Tynkkynen
+/// @version 01.10.2025
+/// <summary>
+/// Owns model data and provides getters for querying data by ModelType. 
+/// </summary>
 internal static class ModelData
-{
+{   
+    /// <summary>
+    /// Map from ModelType to SubModel.
+    /// </summary>
     private static readonly Dictionary<ModelType, SubModel[]> SubModelsMap = new Dictionary<ModelType, SubModel[]>
     {
         { ModelType.WhiteCube, [
@@ -143,7 +221,11 @@ internal static class ModelData
         ] },
     };
 
-    
+    /// <summary>
+    /// Getter for SubModels of model.
+    /// </summary>
+    /// <param name="type">Type of model</param>
+    /// <returns>Array of SubModels or an empty array for invalid model type</returns>
     public static SubModel[] GetSubModels(ModelType type)
     {
         if (type >= ModelType.Invalid)

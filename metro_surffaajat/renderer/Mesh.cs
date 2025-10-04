@@ -4,6 +4,10 @@ using Silk.NET.Maths;
 
 namespace Metro_Surffaajat.renderer;
 
+/// <summary>
+/// Currently implemented meshes.
+/// Invalid represents mesh with no tris. 
+/// </summary>
 public enum MeshType
 {
     Cube,
@@ -11,8 +15,18 @@ public enum MeshType
 }
 
 
+/// @author Tuisku Tynkkynen
+/// @version 01.10.2025
+/// <summary>
+/// Owns mesh data and provides getters for querying data by MeshType. 
+/// </summary>
 public static class Meshes
 {
+    /// @author Tuisku Tynkkynen
+    /// @version 01.10.2025
+    /// <summary>
+    /// Structure for storing mesh vertices and triangles.
+    /// </summary>
     private class MeshData
     {
         public Vector3D<float>[] Vertices;
@@ -20,6 +34,9 @@ public static class Meshes
     }
     
     
+    /// <summary>
+    /// Map from MeshType to MeshData.
+    /// </summary>
     private static readonly Dictionary<MeshType, MeshData> MeshesMap = new Dictionary<MeshType, MeshData>
     {
         { MeshType.Cube,  new MeshData(){
@@ -58,6 +75,11 @@ public static class Meshes
     };
 
     
+    /// <summary>
+    /// Getter for mesh vertex positions.
+    /// </summary>
+    /// <param name="type">Type of mesh</param>
+    /// <returns>Array of vertex positions or an empty array for invalid mesh type</returns>
     public static Vector3D<float>[] GetMeshVertices(MeshType type)
     {
         if (type >= MeshType.Invalid)
@@ -69,6 +91,11 @@ public static class Meshes
     }
     
     
+    /// <summary>
+    /// Getter for mesh triangle indices.
+    /// </summary>
+    /// <param name="type">Type of mesh</param>
+    /// <returns>Array of triangle indices or an empty array for invalid mesh type</returns>
     public static IndexTriangle[] GetMeshIndices(MeshType type)
     {
         if (type >= MeshType.Invalid)
