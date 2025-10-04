@@ -20,7 +20,7 @@ public static class Meshes
     }
     
     
-    private static readonly Dictionary<MeshType, MeshData> Models = new Dictionary<MeshType, MeshData>
+    private static readonly Dictionary<MeshType, MeshData> MeshesMap = new Dictionary<MeshType, MeshData>
     {
         { MeshType.Cube,  new MeshData(){
                 Vertices = 
@@ -65,7 +65,7 @@ public static class Meshes
             return [];
         }
         
-        return Models[type].Vertices;
+        return MeshesMap[type].Vertices;
     }
     
     
@@ -76,6 +76,6 @@ public static class Meshes
             return [];
         }
         
-        return Models[type].VertexIndices;
+        return MeshesMap[type].VertexIndices;
     }
 }

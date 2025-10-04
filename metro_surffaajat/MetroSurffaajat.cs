@@ -12,14 +12,25 @@ namespace Metro_Surffaajat;
 /// @author Tuisku Tynkkynen
 /// @version 01.10.2025
 /// <summary>
-/// 
+/// The main game class.
+/// Owns game state and controls updating state.
 /// </summary>
 public class MetroSurffaajat : PhysicsGame
 {
+    /// <summary>
+    /// Pool of GameObjects used for rendering.
+    /// GameObjects are preallocated to reduce excessive Add and Remove calls.
+    /// </summary>
     private GameObject[] _objectPool = new GameObject[2];
+    /// <summary>
+    /// Cube 3D model used for testing renderer architecture.
+    /// </summary>
     private Model _cube;
     
     
+    /// <summary>
+    /// Initialization method for MetroSurffaajat
+    /// </summary>
     public override void Begin()
     {
         for (uint i = 0; i < _objectPool.Length; i++)
