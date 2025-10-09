@@ -27,7 +27,7 @@ public class Camera3D
     /// <summary>
     /// Position vector of the Camera.
     /// </summary>
-    private Vector3D<float> _position = Vector3D<float>.Zero;
+    public Vector3D<float> Position { get; private set; } = Vector3D<float>.Zero;
 
     /// <summary>
     /// Camera field of view in degrees.
@@ -85,7 +85,7 @@ public class Camera3D
     /// <param name="direction">New Camera view direction. No change if null</param>
     public void Update(Vector3D<float>? position = null, Vector3D<float>? direction = null)
     {
-        _position = position ?? _position;
+        Position = position ?? Position;
         _direction = direction ?? _direction;
 
         UpdateMatrix();
@@ -100,7 +100,7 @@ public class Camera3D
     /// <param name="yaw">New Camera view yaw in degrees.</param>
     public void Update(Vector3D<float>? position = null, float pitch = 0.0f, float yaw = -90.0f)
     {
-        _position = position ?? _position;
+        Position = position ?? Position;
 
         _direction.X = (float)(Math.Cos(Angle.DegreeToRadian(yaw)) * Math.Cos(Angle.DegreeToRadian(pitch)));
         _direction.Y = (float)Math.Sin(Angle.DegreeToRadian(pitch));
@@ -131,7 +131,7 @@ public class Camera3D
         Vector3D<float> cameraRight = Vector3D.Normalize(Vector3D.Cross(_direction, -_worldUp));
         _up = Vector3D.Normalize(Vector3D.Cross(_direction, cameraRight));
 
-        ViewPerspectiveMatrix = Matrix4X4.CreateLookAt(_position, _position + _direction, _up);
+        ViewPerspectiveMatrix = Matrix4X4.CreateLookAt(Position, Position + _direction, _up);
         ViewPerspectiveMatrix *= Matrix4X4.CreatePerspectiveFieldOfView((float)Angle.DegreeToRadian(_fov), _aspectRatio, 0.01f, 10000.0f);
     }
 }
