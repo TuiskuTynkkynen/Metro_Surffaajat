@@ -20,7 +20,7 @@ public enum ModelType
 
 
 /// @author Tuisku Tynkkynen
-/// @version 01.10.2025
+/// @version 09.10.2025
 /// <summary>
 /// Structure for storing Models with 3D transformations and ModelType.
 /// Does not own any SubModels or mesh data.
@@ -66,33 +66,30 @@ public class Model(ModelType type)
     public void Render(ArraySegment<GameObject> gameObjects, ref Camera3D camera)
     {
         SubModel[] subModels = ModelData.GetSubModels(Type);
-        Polygon[] shapes = new Polygon[subModels.Length];
         Tuple<float, int>[] indices = new Tuple<float, int>[subModels.Length];
         
         Debug.Assert(subModels.Length == gameObjects.Count);
 
-        Matrix4X4<float> modelTransform = Matrix4X4.CreateTranslation(Position);
-        modelTransform *= Matrix4X4.CreateFromYawPitchRoll(Rotation.X, Rotation.Y, Rotation.Z);
-        modelTransform *= Matrix4X4.CreateScale(Scale);
-
-        Matrix4X4<float> mvp = modelTransform * camera.ViewPerspectiveMatrix;
-        
         for (int i = 0; i < subModels.Length; i++)
         {
             // Squared distance in cheaper to compute
             float distanceSquared = Vector3D.DistanceSquared(Position + subModels[i].Position, camera.Position);
             indices[i] = new Tuple<float, int>(distanceSquared, i);
-            
-            shapes[i] = subModels[i].ToPolygon(mvp);
         }
 
         Array.Sort(indices, (a, b) => Comparer<float>.Default.Compare(b.Item1, a.Item1));
 
+        Matrix4X4<float> modelTransform = Matrix4X4.CreateTranslation(Position);
+        modelTransform *= Matrix4X4.CreateFromYawPitchRoll(Rotation.X, Rotation.Y, Rotation.Z);
+        modelTransform *= Matrix4X4.CreateScale(Scale);
+        
+        Matrix4X4<float> mvp = modelTransform * camera.ViewPerspectiveMatrix;
+        
         for (int i = 0; i < indices.Length; i++)
         {
             int index = indices[i].Item2;
             
-            gameObjects[i].Shape = shapes[index];
+            gameObjects[i].Shape = subModels[index].ToPolygon(mvp);
             gameObjects[i].Color = subModels[index].Color;
             gameObjects[i].Size = new Vector(100, 100);
         }
