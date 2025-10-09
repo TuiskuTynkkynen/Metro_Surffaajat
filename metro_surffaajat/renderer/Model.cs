@@ -57,13 +57,13 @@ public class Model(ModelType type)
     
     
     /// <summary>
-    /// Transforms the Model's meshes by the transform and provided matrix and
-    /// updates the provided GameObjects to represent the Model.
-    /// The Model's meshes are sorted from farthest to nearest.
+    /// Transforms the Model's meshes by the transform and the view protection matrix of the
+    /// provided camera and updates the provided GameObjects to represent the Model.
+    /// The Model's meshes are sorted from the farthest from the camera to nearest.
     /// </summary>
     /// <param name="gameObjects">ArraySegment of GameObjects. Must be the same size as the Model's SubModel count</param>
-    /// <param name="viewPerspectiveMatrix">External transform matrix</param>
-    public void Render(ArraySegment<GameObject> gameObjects, Matrix4X4<float> viewPerspectiveMatrix)
+    /// <param name="camera">Camera used to get the view perspective matrix and for depth sorting</param>
+    public void Render(ArraySegment<GameObject> gameObjects, ref Camera3D camera)
     {
         SubModel[] subModels = ModelData.GetSubModels(Type);
         Polygon[] shapes = new Polygon[subModels.Length];
@@ -75,12 +75,13 @@ public class Model(ModelType type)
         modelTransform *= Matrix4X4.CreateFromYawPitchRoll(Rotation.X, Rotation.Y, Rotation.Z);
         modelTransform *= Matrix4X4.CreateScale(Scale);
 
-        Matrix4X4<float> mvp = modelTransform * viewPerspectiveMatrix;
+        Matrix4X4<float> mvp = modelTransform * camera.ViewPerspectiveMatrix;
         
         for (int i = 0; i < subModels.Length; i++)
-        { 
-            float distance = (new Vector4D<float>(subModels[i].Position, 1.0f) * mvp).X;
-            indices[i] = new Tuple<float, int>(float.Abs(distance), i);
+        {
+            // Squared distance in cheaper to compute
+            float distanceSquared = Vector3D.DistanceSquared(Position + subModels[i].Position, camera.Position);
+            indices[i] = new Tuple<float, int>(distanceSquared, i);
             
             shapes[i] = subModels[i].ToPolygon(mvp);
         }

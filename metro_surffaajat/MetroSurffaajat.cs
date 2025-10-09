@@ -48,7 +48,7 @@ public class MetroSurffaajat : PhysicsGame
         Timer.CreateAndStart(0.016, delegate
         {
             ArraySegment<GameObject> view = new ArraySegment<GameObject>(_objectPool, 0, _cube.GetSubModelCount());
-            _cube.Render(view, camera.ViewPerspectiveMatrix);
+            _cube.Render(view, ref camera);
         });
         
         Keyboard.Listen(Key.W, ButtonState.Down, delegate { _cube.Position.Z += 0.1f; }, null);
