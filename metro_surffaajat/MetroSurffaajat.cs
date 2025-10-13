@@ -34,6 +34,9 @@ public class MetroSurffaajat : PhysicsGame
     /// </summary>
     public override void Begin()
     {
+        BoundingRectangle normalizedDeviceCoordinates = new BoundingRectangle(0, 0, 2, 2);
+        Camera.ZoomTo(normalizedDeviceCoordinates);
+        
         for (uint i = 0; i < _objectPool.Length; i++)
         {
             _objectPool[i] = new GameObject(0, 0);

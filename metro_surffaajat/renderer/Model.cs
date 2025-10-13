@@ -20,7 +20,7 @@ public enum ModelType
 
 
 /// @author Tuisku Tynkkynen
-/// @version 09.10.2025
+/// @version 13.10.2025
 /// <summary>
 /// Structure for storing Models with 3D transformations and ModelType.
 /// Does not own any SubModels or mesh data.
@@ -91,7 +91,7 @@ public class Model(ModelType type)
             
             gameObjects[i].Shape = subModels[index].ToPolygon(mvp);
             gameObjects[i].Color = subModels[index].Color;
-            gameObjects[i].Size = new Vector(100, 100);
+            gameObjects[i].Size = Vector.One;
         }
     }
 }
