@@ -121,4 +121,28 @@ public readonly struct Rotation<T>
     {
         return (value * (T.CreateChecked(180.0) / T.Pi));
     }
+
+
+    /// <summary>
+    /// Compares if two Rotations are equal.
+    /// </summary>
+    /// <param name="a">First Rotation</param>
+    /// <param name="b">Second Rotation</param>
+    /// <returns>True if the Rotations are equal and false otherwise</returns>
+    public static bool operator ==(Rotation<T> a, Rotation<T> b)
+    {
+        return a.Pitch == b.Pitch && a.Roll == b.Roll && a.Yaw == b.Yaw;
+    }
+
+
+    /// <summary>
+    /// Compares if two Rotations are not equal.
+    /// </summary>
+    /// <param name="a">First Rotation</param>
+    /// <param name="b">Second Rotation</param>
+    /// <returns>True if the Rotations are not equal and false otherwise</returns>
+    public static bool operator !=(Rotation<T> a, Rotation<T> b)
+    {
+        return !(a == b);
+    }
 }
