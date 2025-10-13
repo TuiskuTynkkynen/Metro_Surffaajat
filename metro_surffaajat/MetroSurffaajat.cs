@@ -48,15 +48,6 @@ public class MetroSurffaajat : PhysicsGame
         _cube = new Model(ModelType.DualCube);
         _cube.Position.Z = -2.0f;
         
-        Camera3D camera = new Camera3D(new Vector3D<float>(0.0f, 1.0f, 0.0f), pitch: -45.0f);
-        
-        Timer.CreateAndStart(0.016, delegate
-        {
-            _renderBuffer.BeginRender();
-            _cube.Render(_renderBuffer, ref camera);
-            _renderBuffer.EndRender();
-        });
-        
         Keyboard.Listen(Key.W, ButtonState.Down, delegate { _cube.Position.Z += 0.1f; }, null);
         Keyboard.Listen(Key.A, ButtonState.Down, delegate { _cube.Position.X -= 0.1f; }, null);
         Keyboard.Listen(Key.S, ButtonState.Down, delegate { _cube.Position.Z -= 0.1f;  }, null);
@@ -65,5 +56,22 @@ public class MetroSurffaajat : PhysicsGame
         Keyboard.Listen(Key.LeftShift, ButtonState.Down, delegate { _cube.Position.Y -= 0.1f; }, null);
         
         Keyboard.Listen(Key.Escape, ButtonState.Pressed, ConfirmExit, "Lopeta peli");
+    }
+    
+    
+    /// <summary>
+    /// Jypeli PhysicsGame update method that is automatically called by the library.
+    /// Used to update and render the object in the scene.
+    /// </summary>
+    /// <param name="deltaTime">Time since last frame</param>
+    protected override void Update(Time deltaTime)
+    {   
+        Camera3D camera = new Camera3D(new Vector3D<float>(0.0f, 1.0f, 0.0f), pitch: -45.0f);
+        
+        _renderBuffer.BeginRender();
+        _cube.Render(_renderBuffer, ref camera);
+        _renderBuffer.EndRender();
+    
+        base.Update(deltaTime);
     }
 }
