@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Jypeli;
 using Silk.NET.Maths;
+using Metro_Surffaajat.utility;
 
 namespace Metro_Surffaajat.renderer;
 
@@ -33,7 +34,7 @@ public class Model(ModelType type)
     /// <summary>
     /// The 3D rotation of the Model.
     /// </summary>
-    public Vector3D<float> Rotation = Vector3D<float>.Zero;
+    public Rotation<float> Rotation = Rotation<float>.Zero;
     /// <summary>
     /// The 3D scale of the Model.
     /// </summary>
@@ -73,11 +74,11 @@ public class Model(ModelType type)
             float distanceSquared = Vector3D.DistanceSquared(Position + subModels[i].Position, camera.Position);
             indices[i] = new Tuple<float, int>(distanceSquared, i);
         }
-
+        
         Array.Sort(indices, (a, b) => Comparer<float>.Default.Compare(b.Item1, a.Item1));
 
         Matrix4X4<float> modelTransform = Matrix4X4.CreateTranslation(Position);
-        modelTransform *= Matrix4X4.CreateFromYawPitchRoll(Rotation.X, Rotation.Y, Rotation.Z);
+        modelTransform *= Matrix4X4.CreateFromYawPitchRoll(Rotation.Yaw, Rotation.Pitch, Rotation.Roll);
         modelTransform *= Matrix4X4.CreateScale(Scale);
         
         Matrix4X4<float> mvp = modelTransform * camera.ViewPerspectiveMatrix;
@@ -142,7 +143,7 @@ internal class SubModel
     /// <param name="position">3D position of the submodel</param>
     /// <param name="rotation">3D rotation of the submodel</param>
     /// <param name="scale">3D scale of the submodel</param>
-    public SubModel(MeshType type, Color color, Vector3D<float>? position = null, Vector3D<float>? rotation = null, Vector3D<float>? scale = null)
+    public SubModel(MeshType type, Color color, Vector3D<float>? position = null, Rotation<float>? rotation = null, Vector3D<float>? scale = null)
     {
         Type = type;
         Color = color;
@@ -151,7 +152,7 @@ internal class SubModel
         Transform = Matrix4X4.CreateTranslation(Position);
         if (rotation.HasValue)
         {
-            Transform *= Matrix4X4.CreateFromYawPitchRoll(rotation.Value.X, rotation.Value.Y, rotation.Value.Z);
+            Transform *= Matrix4X4.CreateFromYawPitchRoll(rotation.Value.Yaw, rotation.Value.Pitch, rotation.Value.Roll);
         }
 
         if (scale.HasValue)
@@ -213,7 +214,7 @@ internal static class ModelData
             ] },
         { ModelType.DualCube, [
             new SubModel(MeshType.Cube, Color.White, position: new Vector3D<float>(-2.0f, 0.0f, 0.0f)),
-            new SubModel(MeshType.Cube, Color.Blue, rotation: new Vector3D<float>(25.0f, 45.0f, 90.0f)),
+            new SubModel(MeshType.Cube, Color.Blue, rotation: Rotation<float>.FromDegrees(25.0f, 45.0f, 90.0f)),
         ] },
     };
 
