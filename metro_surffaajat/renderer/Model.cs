@@ -77,11 +77,7 @@ public class Model(ModelType type)
         
         Array.Sort(indices, (a, b) => Comparer<float>.Default.Compare(b.Item1, a.Item1));
 
-        Matrix4X4<float> modelTransform = Matrix4X4.CreateTranslation(Position);
-        modelTransform *= Matrix4X4.CreateFromYawPitchRoll(Rotation.Yaw, Rotation.Pitch, Rotation.Roll);
-        modelTransform *= Matrix4X4.CreateScale(Scale);
-        
-        Matrix4X4<float> mvp = modelTransform * camera.ViewPerspectiveMatrix;
+        Matrix4X4<float> mvp = MatrixMath.CreateTransform<float>(Position, Rotation, Scale) * camera.ViewPerspectiveMatrix;
 
         foreach (var (_, index) in indices)
         {
@@ -148,17 +144,8 @@ internal class SubModel
         Type = type;
         Color = color;
         Position = position ?? Vector3D<float>.Zero;
-        
-        Transform = Matrix4X4.CreateTranslation(Position);
-        if (rotation.HasValue)
-        {
-            Transform *= Matrix4X4.CreateFromYawPitchRoll(rotation.Value.Yaw, rotation.Value.Pitch, rotation.Value.Roll);
-        }
 
-        if (scale.HasValue)
-        {
-            Transform *= Matrix4X4.CreateScale(scale.Value);
-        }
+        Transform = MatrixMath.CreateTransform(position, rotation, scale);
     }
     
 
