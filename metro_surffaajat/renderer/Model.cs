@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using Jypeli;
 using Silk.NET.Maths;
 
@@ -61,14 +60,12 @@ public class Model(ModelType type)
     /// provided camera and updates the provided GameObjects to represent the Model.
     /// The Model's meshes are sorted from the farthest from the camera to nearest.
     /// </summary>
-    /// <param name="gameObjects">ArraySegment of GameObjects. Must be the same size as the Model's SubModel count</param>
+    /// <param name="buffer">RenderBuffer the Model is rendered to</param>
     /// <param name="camera">Camera used to get the view perspective matrix and for depth sorting</param>
-    public void Render(ArraySegment<GameObject> gameObjects, ref Camera3D camera)
+    public void Render(RenderBuffer buffer, ref Camera3D camera)
     {
         SubModel[] subModels = ModelData.GetSubModels(Type);
         Tuple<float, int>[] indices = new Tuple<float, int>[subModels.Length];
-        
-        Debug.Assert(subModels.Length == gameObjects.Count);
 
         for (int i = 0; i < subModels.Length; i++)
         {
@@ -84,14 +81,15 @@ public class Model(ModelType type)
         modelTransform *= Matrix4X4.CreateScale(Scale);
         
         Matrix4X4<float> mvp = modelTransform * camera.ViewPerspectiveMatrix;
-        
-        for (int i = 0; i < indices.Length; i++)
+
+        foreach (var (_, index) in indices)
         {
-            int index = indices[i].Item2;
+            ref SubModel subModel = ref subModels[index];
+            ref GameObject gameObject = ref buffer.GetNext();
             
-            gameObjects[i].Shape = subModels[index].ToPolygon(mvp);
-            gameObjects[i].Color = subModels[index].Color;
-            gameObjects[i].Size = Vector.One;
+            gameObject.Shape = subModel.ToPolygon(mvp);
+            gameObject.Color = subModel.Color;
+            gameObject.Size = Vector.One;
         }
     }
 }

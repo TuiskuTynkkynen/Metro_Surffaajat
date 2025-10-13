@@ -10,7 +10,7 @@ using Metro_Surffaajat.renderer;
 namespace Metro_Surffaajat;
 
 /// @author Tuisku Tynkkynen
-/// @version 01.10.2025
+/// @version 13.10.2025
 /// <summary>
 /// The main game class.
 /// Owns game state and controls updating state.
@@ -18,10 +18,9 @@ namespace Metro_Surffaajat;
 public class MetroSurffaajat : PhysicsGame
 {
     /// <summary>
-    /// Pool of GameObjects used for rendering.
-    /// GameObjects are preallocated to reduce excessive Add and Remove calls.
+    /// Preallocated buffer of GameObjects used for rendering.
     /// </summary>
-    private GameObject[] _objectPool = new GameObject[2];
+    private RenderBuffer _renderBuffer;
     /// <summary>
     /// Cube 3D model used for testing renderer architecture.
     /// </summary>
@@ -37,11 +36,14 @@ public class MetroSurffaajat : PhysicsGame
         BoundingRectangle normalizedDeviceCoordinates = new BoundingRectangle(0, 0, 2, 2);
         Camera.ZoomTo(normalizedDeviceCoordinates);
         
-        for (uint i = 0; i < _objectPool.Length; i++)
+        GameObject[] objects = new GameObject[2];
+        for (uint i = 0; i < objects.Length; i++)
         {
-            _objectPool[i] = new GameObject(0, 0);
-            Add(_objectPool[i]);
+            objects[i] = new GameObject(0, 0);
+            Add(objects[i]);
         }
+
+        _renderBuffer = new RenderBuffer(objects);
         
         _cube = new Model(ModelType.DualCube);
         _cube.Position.Z = -2.0f;
@@ -50,8 +52,9 @@ public class MetroSurffaajat : PhysicsGame
         
         Timer.CreateAndStart(0.016, delegate
         {
-            ArraySegment<GameObject> view = new ArraySegment<GameObject>(_objectPool, 0, _cube.GetSubModelCount());
-            _cube.Render(view, ref camera);
+            _renderBuffer.BeginRender();
+            _cube.Render(_renderBuffer, ref camera);
+            _renderBuffer.EndRender();
         });
         
         Keyboard.Listen(Key.W, ButtonState.Down, delegate { _cube.Position.Z += 0.1f; }, null);
