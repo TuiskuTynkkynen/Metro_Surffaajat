@@ -36,14 +36,7 @@ public class MetroSurffaajat : PhysicsGame
         BoundingRectangle normalizedDeviceCoordinates = new BoundingRectangle(0, 0, 2, 2);
         Camera.ZoomTo(normalizedDeviceCoordinates);
         
-        GameObject[] objects = new GameObject[2];
-        for (uint i = 0; i < objects.Length; i++)
-        {
-            objects[i] = new GameObject(0, 0);
-            Add(objects[i]);
-        }
-
-        _renderBuffer = new RenderBuffer(objects);
+        _renderBuffer = new RenderBuffer(CreateGameObjectArray(2));
         
         _cube = new Model(ModelType.DualCube);
         _cube.Position.Z = -2.0f;
@@ -73,5 +66,24 @@ public class MetroSurffaajat : PhysicsGame
         _renderBuffer.EndRender();
     
         base.Update(deltaTime);
+    }
+
+    /// <summary>
+    /// Creates an array of GameObjects, initializes them as default GameObjects
+    /// of size (0, 0), and Adds them to the game.
+    /// </summary>
+    /// <param name="size">Size of the array</param>
+    /// <returns>Array of initialized and Added GameObjects</returns>
+    private GameObject[] CreateGameObjectArray(uint size)
+    {
+        GameObject[] objects = new GameObject[size];
+        
+        for (uint i = 0; i < size; i++)
+        {
+            objects[i] = new GameObject(0, 0);
+            Add(objects[i]);
+        }
+
+        return objects;
     }
 }
