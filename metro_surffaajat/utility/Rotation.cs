@@ -1,12 +1,14 @@
+using System;
+
 namespace Metro_Surffaajat.utility;
 
 /// @author Tuisku Tynkkynen
-/// @version 13.10.2025
+/// @version 14.10.2025
 /// <summary>
 /// Represents a 3d rotation as a pitch, roll and yaw angles in radians.
 /// </summary>
 /// <typeparam name="T">. Must be an unmanaged floating point type</typeparam>
-public readonly struct Rotation<T>
+public readonly struct Rotation<T> : IEquatable<Rotation<T>> 
     where T : unmanaged, System.Numerics.IFloatingPoint<T>
 {
     /// <summary>
@@ -89,7 +91,7 @@ public readonly struct Rotation<T>
     /// <summary>
     /// Returns a rotation with all angles set to 0.
     /// </summary>
-    public static Rotation<T> Zero => new Rotation<T>();
+    public static Rotation<T> Zero => new();
     
     /// <summary>
     /// Creates a Rotation from pitch, roll, and yaw angles in radians.
@@ -140,7 +142,7 @@ public readonly struct Rotation<T>
     /// <returns>True if the Rotations are equal and false otherwise</returns>
     public static bool operator ==(Rotation<T> a, Rotation<T> b)
     {
-        return a.Pitch == b.Pitch && a.Roll == b.Roll && a.Yaw == b.Yaw;
+        return a.Equals(b);
     }
 
 
@@ -152,6 +154,39 @@ public readonly struct Rotation<T>
     /// <returns>True if the Rotations are not equal and false otherwise</returns>
     public static bool operator !=(Rotation<T> a, Rotation<T> b)
     {
-        return !(a == b);
+        return !a.Equals(b);
     }
+
+    
+    /// <summary>
+    /// Compares this Rotation instance to provided Rotation.
+    /// </summary>
+    /// <param name="other">Rotation this is compared to</param>
+    /// <returns>True if this and other are equal and false otherwise</returns>
+    public bool Equals(Rotation<T> other)
+    {
+        return _angles.Equals(other._angles);
+    }
+    
+    
+    /// <summary>
+    /// Compares this Rotation instance to provided object.
+    /// </summary>
+    /// <param name="obj">Object this is compared to</param>
+    /// <returns>True if this and obj are equal and false otherwise</returns>
+    public override bool Equals(object obj)
+    {
+        return obj is Rotation<T> other && Equals(other);
+    }
+
+    
+    /// <summary>
+    /// Returns the hash code for this Rotation instance.
+    /// </summary>
+    /// <returns>Hash code</returns>
+    public override int GetHashCode()
+    {
+        return _angles.GetHashCode();
+    }
+
 }
