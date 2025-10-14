@@ -20,7 +20,7 @@ public enum ModelType
 
 
 /// @author Tuisku Tynkkynen
-/// @version 13.10.2025
+/// @version 14.10.2025
 /// <summary>
 /// Structure for storing Models with 3D transformations and ModelType.
 /// Does not own any SubModels or mesh data.
@@ -63,7 +63,7 @@ public class Model(ModelType type)
     /// </summary>
     /// <param name="buffer">RenderBuffer the Model is rendered to</param>
     /// <param name="camera">Camera used to get the view perspective matrix and for depth sorting</param>
-    public void Render(RenderBuffer buffer, ref Camera3D camera)
+    public void Render(RenderBuffer buffer, ref readonly Camera3D camera)
     {
         SubModel[] subModels = ModelData.GetSubModels(Type);
         Tuple<float, int>[] indices = new Tuple<float, int>[subModels.Length];
@@ -81,8 +81,8 @@ public class Model(ModelType type)
 
         foreach (var (_, index) in indices)
         {
-            ref SubModel subModel = ref subModels[index];
-            ref GameObject gameObject = ref buffer.GetNext();
+            ref readonly SubModel subModel = ref subModels[index];
+            ref readonly GameObject gameObject = ref buffer.GetNext();
             
             gameObject.Shape = subModel.ToPolygon(mvp);
             gameObject.Color = subModel.Color;
