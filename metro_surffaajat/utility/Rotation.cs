@@ -64,6 +64,15 @@ public readonly struct Rotation<T>
         set => this._angles[2] = DegreeToRadian(value);
     }
 
+
+    /// <summary>
+    /// Creates a rotation with all angles set to 0.
+    /// </summary>
+    public Rotation()
+    {
+        _angles = [T.Zero, T.Zero, T.Zero];
+    }
+    
     
     /// <summary>
     /// Creates a Rotation from pitch, roll, and yaw angles in radians.
