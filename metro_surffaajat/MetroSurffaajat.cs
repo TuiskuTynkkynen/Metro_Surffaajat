@@ -10,7 +10,18 @@ using Metro_Surffaajat.renderer;
 namespace Metro_Surffaajat;
 
 /// @author Tuisku Tynkkynen
-/// @version 13.10.2025
+/// @version 14.10.2025
+/// <summary>
+/// Enum of the layers used by Renderer.
+/// </summary>
+internal enum RenderLayers
+{
+    Default
+}
+
+
+/// @author Tuisku Tynkkynen
+/// @version 14.10.2025
 /// <summary>
 /// The main game class.
 /// Owns game state and controls updating state.
@@ -18,9 +29,9 @@ namespace Metro_Surffaajat;
 public class MetroSurffaajat : PhysicsGame
 {
     /// <summary>
-    /// Preallocated buffer of GameObjects used for rendering.
+    /// The Renderer used for testing renderer architecture.
     /// </summary>
-    private RenderBuffer _renderBuffer;
+    private Renderer<RenderLayers> _renderer;
     /// <summary>
     /// Cube 3D model used for testing renderer architecture.
     /// </summary>
@@ -36,7 +47,7 @@ public class MetroSurffaajat : PhysicsGame
         BoundingRectangle normalizedDeviceCoordinates = new BoundingRectangle(0, 0, 2, 2);
         Camera.ZoomTo(normalizedDeviceCoordinates);
         
-        _renderBuffer = new RenderBuffer(CreateGameObjectArray(2));
+        _renderer = new Renderer<RenderLayers>(() => CreateGameObjectArray(2));
         
         _cube = new Model(ModelType.DualCube);
         _cube.Position.Z = -2.0f;
@@ -61,13 +72,14 @@ public class MetroSurffaajat : PhysicsGame
     {   
         Camera3D camera = new Camera3D(new Vector3D<float>(0.0f, 1.0f, 0.0f), pitch: -45.0f);
         
-        _renderBuffer.BeginRender();
-        _cube.Render(_renderBuffer, ref camera);
-        _renderBuffer.EndRender();
+        _renderer.BeginRender(camera);
+        _renderer.Submit(ref _cube, RenderLayers.Default);
+        _renderer.EndRender();
     
         base.Update(deltaTime);
     }
 
+    
     /// <summary>
     /// Creates an array of GameObjects, initializes them as default GameObjects
     /// of size (0, 0), and Adds them to the game.
