@@ -1,9 +1,4 @@
-using System;
-using System.Collections.Generic;
 using Jypeli;
-using Jypeli.Assets;
-using Jypeli.Controls;
-using Jypeli.Widgets;
 using Silk.NET.Maths;
 using Metro_Surffaajat.renderer;
 
