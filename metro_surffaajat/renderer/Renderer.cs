@@ -5,7 +5,7 @@ using Jypeli;
 namespace Metro_Surffaajat.renderer;
 
 /// @author Tuisku Tynkkynen
-/// @version 14.10.2025
+/// @version 15.10.2025
 /// <summary>
 /// Collection of RenderBuffers used as render layers.
 /// Automates RenderBuffer management.
@@ -116,7 +116,8 @@ public class Renderer<TLayerEnum>
         {
             throw new InvalidOperationException("Frame has to be began with BeginRender() before it can be ended");
         }
-        
+
+        _camera = null;
         foreach (var (_, buffer) in _buffers)
         {
             buffer.EndRender();
