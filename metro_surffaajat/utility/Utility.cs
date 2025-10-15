@@ -3,11 +3,11 @@ using Silk.NET.Maths;
 namespace Metro_Surffaajat.utility;
 
 /// @author Tuisku Tynkkynen
-/// @version 13.10.2025
+/// @version 15.10.2025
 /// <summary>
-/// Collection of matrix math functions.
+/// Collection of utility functions.
 /// </summary>
-public static class MatrixMath
+public static class Utility
 {
     /// <summary>
     /// Creates a transformation matrix from the provided vectors.
