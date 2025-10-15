@@ -20,7 +20,7 @@ public enum ModelType
 
 
 /// @author Tuisku Tynkkynen
-/// @version 14.10.2025
+/// @version 15.10.2025
 /// <summary>
 /// Structure for storing Models with 3D transformations and ModelType.
 /// Does not own any SubModels or mesh data.
@@ -39,7 +39,11 @@ public class Model(ModelType type)
     /// The 3D scale of the Model.
     /// </summary>
     public Vector3D<float> Scale = Vector3D<float>.One;
-
+    /// <summary>
+    /// Tint of the Model. Use white for unmodified SubModel Colors. 
+    /// </summary>
+    public Color Tint = Color.White;
+    
     /// <summary>
     /// Type of Model. Used for querying SubModels.
     /// </summary>
@@ -77,7 +81,7 @@ public class Model(ModelType type)
         
         Array.Sort(indices, (a, b) => Comparer<float>.Default.Compare(b.Item1, a.Item1));
 
-        Matrix4X4<float> mvp = MatrixMath.CreateTransform<float>(Position, Rotation, Scale) * camera.ViewPerspectiveMatrix;
+        Matrix4X4<float> mvp = Utility.CreateTransform<float>(Position, Rotation, Scale) * camera.ViewPerspectiveMatrix;
 
         foreach (var (_, index) in indices)
         {
@@ -85,7 +89,7 @@ public class Model(ModelType type)
             ref readonly GameObject gameObject = ref buffer.GetNext();
             
             gameObject.Shape = subModel.ToPolygon(mvp);
-            gameObject.Color = subModel.Color;
+            gameObject.Color = Utility.Multiply(Tint, subModel.Color);
             gameObject.Size = Vector.One;
         }
     }
@@ -93,7 +97,7 @@ public class Model(ModelType type)
 
 
 /// @author Tuisku Tynkkynen
-/// @version 01.10.2025
+/// @version 15.10.2025
 /// <summary>
 /// Structure for storing SubModel transform data and mesh type.
 /// Does not own any mesh data.
@@ -145,7 +149,7 @@ internal class SubModel
         Color = color;
         Position = position ?? Vector3D<float>.Zero;
 
-        Transform = MatrixMath.CreateTransform(position, rotation, scale);
+        Transform = Utility.CreateTransform(position, rotation, scale);
     }
     
 
