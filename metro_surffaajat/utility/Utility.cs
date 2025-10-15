@@ -1,3 +1,4 @@
+using Jypeli;
 using Silk.NET.Maths;
 
 namespace Metro_Surffaajat.utility;
@@ -36,5 +37,24 @@ public static class Utility
         }
         
         return result;
+    }
+
+
+    /// <summary>
+    /// Linearly interpolates two colors in sRGB based of specified weight and clamps
+    /// result to sRGB.
+    /// </summary>
+    /// <param name="a">First Color</param>
+    /// <param name="b">Second Color</param>
+    /// <param name="weight">Weight between 0 and 1</param>
+    /// <returns>Interpolated Color</returns>
+    public static Color Lerp(Color a, Color b, double weight)
+    {
+        double alpha = double.Lerp(a.AlphaComponent, b.AlphaComponent, weight) / byte.MaxValue;
+        double red = double.Lerp(a.RedComponent, b.RedComponent, weight) / byte.MaxValue;
+        double green = double.Lerp(a.GreenComponent, b.GreenComponent, weight) / byte.MaxValue;
+        double blue = double.Lerp(a.BlueComponent, b.BlueComponent, weight) / byte.MaxValue;
+
+        return new Color(double.Clamp(red, 0, 1), double.Clamp(green, 0, 1), double.Clamp(blue, 0, 1), double.Clamp(alpha, 0, 1));
     }
 }
