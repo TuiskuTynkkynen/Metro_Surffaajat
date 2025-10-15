@@ -57,4 +57,24 @@ public static class Utility
 
         return new Color(double.Clamp(red, 0, 1), double.Clamp(green, 0, 1), double.Clamp(blue, 0, 1), double.Clamp(alpha, 0, 1));
     }
+    
+
+    /// <summary>
+    /// Multiplies specified colors in sRGB and clamps them to sRGB.
+    /// </summary>
+    /// <param name="a">First Color</param>
+    /// <param name="b">Second Color</param>
+    /// <returns>Multiplied Color</returns>
+    public static Color Multiply(Color a, Color b)
+    {
+        // Converts byte into range 0.0 to 1.0. 
+        const double byteToDouble = 1.0 / byte.MaxValue;
+        
+        double alpha = (a.AlphaComponent * byteToDouble) * (byteToDouble * b.AlphaComponent);
+        double red = (a.RedComponent * byteToDouble) * (byteToDouble * b.RedComponent);
+        double green = (a.GreenComponent * byteToDouble) * (byteToDouble * b.GreenComponent);
+        double blue = (a.BlueComponent * byteToDouble) * (byteToDouble * b.BlueComponent);
+
+        return new Color(double.Clamp(red, 0, 1), double.Clamp(green, 0, 1), double.Clamp(blue, 0, 1), double.Clamp(alpha, 0, 1));
+    }
 }
