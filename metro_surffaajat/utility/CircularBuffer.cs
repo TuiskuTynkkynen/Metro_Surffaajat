@@ -114,20 +114,26 @@ public class CircularBuffer<T>(int capacity) :
     /// <summary>
     /// Get enumerator that iterates through internal buffer.
     /// </summary>
-    /// <returns>Enumerator</returns>
+    /// <returns>Enumerator that iterates over buffer</returns>
     public IEnumerator GetEnumerator()
     {
-        return new CircularEnumerator(this);
+        for (int i = 0; i < Count; i++)
+        {
+            yield return this[i];
+        }
     }
     
     
     /// <summary>
     /// Get enumerator that iterates through internal buffer.
     /// </summary>
-    /// <returns>Enumerator</returns>
+    /// <returns>Enumerator that iterates over buffer</returns>
     IEnumerator<T> IEnumerable<T>.GetEnumerator()
     {
-        return new CircularEnumerator(this);
+        for (int i = 0; i < Count; i++)
+        {
+            yield return this[i];
+        }
     }
 
     /// <summary>
@@ -169,76 +175,5 @@ public class CircularBuffer<T>(int capacity) :
         }
         
         return index;
-    }
-    
-    
-    /// @author Tuisku Tynkkynen
-    /// @version 15.10.2025
-    /// <summary>
-    /// Enumerator for iterating over CircularBuffer.
-    /// </summary>
-    /// <param name="buffer">CircularBuffer to iterate over</param>
-    private class CircularEnumerator(CircularBuffer<T> buffer)
-        : IEnumerator<T>
-    {
-        /// <summary>
-        /// Current index in the buffer. Enumerators are positioned before
-        /// start of buffer before calling MoveNext().
-        /// </summary>
-        private int _currentIndex = -1;
-        
-    
-        /// <summary>
-        /// Tries to move to next element in the buffer.
-        /// </summary>
-        /// <returns>True, if advancing was successful. False, if enumerator
-        /// has passed end of buffer</returns>
-        public bool MoveNext()
-        {
-            return (++_currentIndex >= buffer.Count);
-        }
-
-        
-        /// <summary>
-        /// Resets enumerator to initial position before start of buffer.
-        /// </summary>
-        public void Reset() { _currentIndex = -1; }
-
-
-        /// <summary>
-        /// Needed to fulfill IEnumerator interface. Not currently implemented.
-        /// </summary>
-        /// <exception cref="NotImplementedException">Not implemented</exception>
-        void IDisposable.Dispose()
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Gets the current element.
-        /// </summary>
-        /// <exception cref="InvalidOperationException">Enumerator positioned
-        /// before start or after end of buffer</exception>
-        T IEnumerator<T>.Current  => GetCurrent();
-        /// <summary>
-        /// Gets the current element.
-        /// </summary>
-        /// <exception cref="InvalidOperationException">Enumerator positioned
-        /// before start or after end of buffer</exception>
-        public object Current => GetCurrent();
-        
-        /// <summary>
-        /// Gets the current element.
-        /// </summary>
-        /// <returns>Current element</returns>
-        /// <exception cref="InvalidOperationException">Enumerator positioned
-        /// before start or after end of buffer</exception>
-        private T GetCurrent()
-        {
-            if(_currentIndex < 0 || _currentIndex >= buffer.Count)
-                throw new InvalidOperationException();
-                
-            return buffer[(uint)_currentIndex];
-        }
     }
 }
