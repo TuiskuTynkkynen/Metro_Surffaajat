@@ -25,7 +25,7 @@ public class CircularBuffer<T>(int capacity) :
     /// <summary>
     /// Hold maximum number of elements.
     /// </summary>
-    public bool IsFull => Count != Capacity;
+    public bool IsFull => Count == Capacity;
     /// <summary>
     /// Holds no elements.
     /// </summary>
@@ -65,7 +65,7 @@ public class CircularBuffer<T>(int capacity) :
 
     
     /// <summary>
-    /// Adds element to buffer. If IsFull, overwrites earliest element.
+    /// Adds element to the end of the buffer. If IsFull, overwrites earliest element.
     /// </summary>
     /// <param name="value">Value to be added</param>
     public void Add(T value)
@@ -75,8 +75,12 @@ public class CircularBuffer<T>(int capacity) :
             _head = 0;
         }
         
+        if(!IsFull)
+        {
+            Count++;
+        }
+
         _data[_head] = value;
-        Count++;
     }
 
     
