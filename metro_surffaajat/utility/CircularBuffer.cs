@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace Metro_Surffaajat.utility;
 
 /// @author Tuisku Tynkkynen
-/// @version 15.10.2025
+/// @version 16.10.2025
 /// <summary>
 /// 
 /// </summary>
@@ -160,20 +160,20 @@ public class CircularBuffer<T>(int capacity) :
     /// <param name="index">Index of the element inside CircularBuffer</param>
     /// <returns>Index of the element inside internal buffer</returns>
     /// <exception cref="ArgumentOutOfRangeException">Specified index must be less than Count</exception>
-    private uint CalculateIndex(uint index)
+    private int CalculateIndex(uint index)
     {
         if (index >= Count)
         {
             throw new ArgumentOutOfRangeException(nameof(index), index, $"was not valid index of CircularBuffer<{nameof(T)}> with Count {Count}");
         }
         
-        // Could be calculated with modulus, but this should be faster  
-        index += (uint)_head;
-        if (index >= Capacity)
-        {
-            index -= (uint)Capacity;
-        }
+        int tail = _head - Count + 1;
+        int internalIndex = tail + (int)index;
         
-        return index;
+        // Could be calculated with modulus, but this should be faster  
+        internalIndex += (internalIndex < 0) ? Capacity : 0;
+        internalIndex -= (internalIndex >= Capacity) ? Capacity : 0;
+        
+        return internalIndex;
     }
 }
