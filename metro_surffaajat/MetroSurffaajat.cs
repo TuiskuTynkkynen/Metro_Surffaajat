@@ -5,11 +5,11 @@ using Metro_Surffaajat.renderer;
 namespace Metro_Surffaajat;
 
 /// @author Tuisku Tynkkynen
-/// @version 14.10.2025
+/// @version 16.10.2025
 /// <summary>
 /// Enum of the layers used by Renderer.
 /// </summary>
-internal enum RenderLayers
+public enum RenderLayers
 {
     Default
 }
