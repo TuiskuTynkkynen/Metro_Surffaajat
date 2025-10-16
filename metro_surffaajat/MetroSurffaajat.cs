@@ -16,7 +16,7 @@ public enum RenderLayers
 
 
 /// @author Tuisku Tynkkynen
-/// @version 14.10.2025
+/// @version 16.10.2025
 /// <summary>
 /// The main game class.
 /// Owns game state and controls updating state.
@@ -28,9 +28,9 @@ public class MetroSurffaajat : PhysicsGame
     /// </summary>
     private Renderer<RenderLayers> _renderer;
     /// <summary>
-    /// Cube 3D model used for testing renderer architecture.
+    /// Level used for testing game and renderer architecture.
     /// </summary>
-    private Model _cube;
+    private game.Level _level;
     
     
     /// <summary>
@@ -42,17 +42,8 @@ public class MetroSurffaajat : PhysicsGame
         BoundingRectangle normalizedDeviceCoordinates = new BoundingRectangle(0, 0, 2, 2);
         Camera.ZoomTo(normalizedDeviceCoordinates);
         
-        _renderer = new Renderer<RenderLayers>(() => CreateGameObjectArray(2));
-        
-        _cube = new Model(ModelType.DualCube);
-        _cube.Position.Z = -2.0f;
-        
-        Keyboard.Listen(Key.W, ButtonState.Down, delegate { _cube.Position.Z += 0.1f; }, null);
-        Keyboard.Listen(Key.A, ButtonState.Down, delegate { _cube.Position.X -= 0.1f; }, null);
-        Keyboard.Listen(Key.S, ButtonState.Down, delegate { _cube.Position.Z -= 0.1f;  }, null);
-        Keyboard.Listen(Key.D, ButtonState.Down, delegate { _cube.Position.X += 0.1f; }, null);
-        Keyboard.Listen(Key.Space, ButtonState.Down, delegate { _cube.Position.Y += 0.1f; }, null);
-        Keyboard.Listen(Key.LeftShift, ButtonState.Down, delegate { _cube.Position.Y -= 0.1f; }, null);
+        _renderer = new Renderer<RenderLayers>(() => CreateGameObjectArray(32));
+        _level = new game.Level();
         
         Keyboard.Listen(Key.Escape, ButtonState.Pressed, ConfirmExit, "Lopeta peli");
     }
@@ -60,15 +51,18 @@ public class MetroSurffaajat : PhysicsGame
     
     /// <summary>
     /// Jypeli PhysicsGame update method that is automatically called by the library.
-    /// Used to update and render the object in the scene.
+    /// Used to update and render the game level.
     /// </summary>
     /// <param name="deltaTime">Time since last frame</param>
     protected override void Update(Time deltaTime)
     {   
-        Camera3D camera = new Camera3D(new Vector3D<float>(0.0f, 1.0f, 0.0f), pitch: -45.0f);
+        Camera3D camera = new Camera3D(new Vector3D<float>(0.0f, 2.0f, 0.0f), pitch: -45.0f);
         
         _renderer.BeginRender(camera);
-        _renderer.Submit(ref _cube, RenderLayers.Default);
+        
+        _level.Update((float)deltaTime.SinceLastUpdate.TotalSeconds);
+        _level.Render(ref _renderer);
+        
         _renderer.EndRender();
     
         base.Update(deltaTime);
