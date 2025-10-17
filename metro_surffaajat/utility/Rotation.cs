@@ -3,7 +3,7 @@ using System;
 namespace Metro_Surffaajat.utility;
 
 /// @author Tuisku Tynkkynen
-/// @version 14.10.2025
+/// @version 17.10.2025
 /// <summary>
 /// Represents a 3d rotation as a pitch, roll and yaw angles in radians.
 /// </summary>
@@ -165,7 +165,7 @@ public readonly struct Rotation<T> : IEquatable<Rotation<T>>
     /// <returns>True if this and other are equal and false otherwise</returns>
     public bool Equals(Rotation<T> other)
     {
-        return _angles.Equals(other._angles);
+        return Pitch.Equals(other.Pitch) && Roll.Equals(other.Pitch) && Yaw.Equals(other.Yaw);
     }
     
     
