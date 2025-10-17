@@ -22,7 +22,7 @@ public enum ObstacleType
 
 
 /// @author Tuisku Tynkkynen
-/// @version 16.10.2025
+/// @version 17.10.2025
 /// <summary>
 /// Owns obstacle data and provides getters for querying data by ObstacleType. 
 /// </summary>
@@ -52,9 +52,9 @@ public static class Obstacles
     /// </summary>
     private static readonly Dictionary<ObstacleType, ObstacleData> ObstacleDataMap = new(){
         {ObstacleType.None, new (ModelType.Invalid, new BoundingCuboid<float>(), 0.75f, [ObstacleType.TrainStart])},
-        {ObstacleType.TrainStart, new (ModelType.WhiteCube, new (Vector3D<float>.One), 0.0f, [ObstacleType.Train])},
-        {ObstacleType.Train, new (ModelType.BlueCube, new (Vector3D<float>.One), 0.75f, [ObstacleType.TrainEnd])},
-        {ObstacleType.TrainEnd, new (ModelType.WhiteCube, new (Vector3D<float>.One), 0.0f, [ObstacleType.None])},
+        {ObstacleType.TrainStart, new (ModelType.TrainCargoFront, new (Vector3D<float>.One), 0.0f, [ObstacleType.Train])},
+        {ObstacleType.Train, new (ModelType.TrainCargo, new (Vector3D<float>.One), 0.75f, [ObstacleType.TrainEnd])},
+        {ObstacleType.TrainEnd, new (ModelType.TrainCargo, new (Vector3D<float>.One), 0.0f, [ObstacleType.None])},
     };
     
     

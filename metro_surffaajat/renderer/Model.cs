@@ -15,6 +15,8 @@ public enum ModelType
     WhiteCube,
     BlueCube,
     DualCube,
+    TrainCargoFront,
+    TrainCargo,
     Invalid,
 }
 
@@ -186,12 +188,16 @@ internal class SubModel
 
 
 /// @author Tuisku Tynkkynen
-/// @version 01.10.2025
+/// @version 17.10.2025
 /// <summary>
 /// Owns model data and provides getters for querying data by ModelType. 
 /// </summary>
 internal static class ModelData
-{   
+{
+    private static readonly Vector3D<float> OffsetBase =  new Vector3D<float>(0.0f, -0.45f, 0.0f);
+    private static readonly Vector3D<float> OffsetTop =   new Vector3D<float>(0.0f,  0.45f, 0.0f);
+    private static readonly Vector3D<float> OffsetFront = new Vector3D<float>(0.0f,  0.0f , 0.5f);
+    
     /// <summary>
     /// Map from ModelType to SubModel.
     /// </summary>
@@ -206,6 +212,22 @@ internal static class ModelData
         { ModelType.DualCube, [
             new SubModel(MeshType.Cube, Color.White, position: new Vector3D<float>(-2.0f, 0.0f, 0.0f)),
             new SubModel(MeshType.Cube, Color.Blue, rotation: Rotation<float>.FromDegrees(25.0f, 45.0f, 90.0f)),
+        ] },
+        { ModelType.TrainCargoFront, [
+            new SubModel(MeshType.TrainBase,      new Color(34, 66, 88),    position: OffsetBase),
+            new SubModel(MeshType.TrainBaseFront, new Color(34, 66, 88),    position: OffsetBase + OffsetFront),
+            new SubModel(MeshType.TrainBody,      new Color(44, 101, 128)),
+            new SubModel(MeshType.TrainBodyFront, new Color(44, 101, 128),  position: OffsetFront),
+            new SubModel(MeshType.TrainTrim,      new Color(112, 161, 179)),
+            new SubModel(MeshType.TrainTrimFront, new Color(112, 161, 179), position: OffsetFront),
+            new SubModel(MeshType.TrainTop,       new Color(112, 161, 179), position: OffsetTop),
+            new SubModel(MeshType.TrainTopFront,  new Color(112, 161, 179), position: OffsetTop + OffsetFront),
+        ] },
+        { ModelType.TrainCargo, [                                                                                    
+            new SubModel(MeshType.TrainBase,  new Color(34, 66, 88), position: new Vector3D<float>(0.0f, -0.45f, 0.0f)),        
+            new SubModel(MeshType.TrainBody, new Color(44, 101, 128)),                                                           
+            new SubModel(MeshType.TrainTrim, new Color(112, 161, 179)),          
+            new SubModel(MeshType.TrainTop,  new Color(112, 161, 179), position: new Vector3D<float>(0.0f, 0.45f, 0.0f)),          
         ] },
     };
 
