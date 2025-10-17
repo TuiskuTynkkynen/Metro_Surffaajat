@@ -20,7 +20,7 @@ public enum ModelType
 
 
 /// @author Tuisku Tynkkynen
-/// @version 15.10.2025
+/// @version 17.10.2025
 /// <summary>
 /// Structure for storing Models with 3D transformations and ModelType.
 /// Does not own any SubModels or mesh data.
@@ -88,7 +88,7 @@ public class Model(ModelType type)
             ref readonly SubModel subModel = ref subModels[index];
             ref readonly GameObject gameObject = ref buffer.GetNext();
             
-            gameObject.Shape = subModel.ToPolygon(mvp);
+            gameObject.Shape = subModel.ToPolygon(ref mvp);
             gameObject.Color = Utility.Multiply(Tint, subModel.Color);
             gameObject.Size = Vector.One;
         }
@@ -97,7 +97,7 @@ public class Model(ModelType type)
 
 
 /// @author Tuisku Tynkkynen
-/// @version 15.10.2025
+/// @version 17.10.2025
 /// <summary>
 /// Structure for storing SubModel transform data and mesh type.
 /// Does not own any mesh data.
@@ -159,7 +159,7 @@ internal class SubModel
     /// </summary>
     /// <param name="modelViewPerspectiveMatrix">External transform matrix</param>
     /// <returns>Polygon with transformed vertices</returns>
-    public Polygon ToPolygon(Matrix4X4<float> modelViewPerspectiveMatrix)
+    public Polygon ToPolygon(ref readonly Matrix4X4<float> modelViewPerspectiveMatrix)
     {
         Matrix4X4<float> transformation = Transform * modelViewPerspectiveMatrix;
         Vector3D<float>[] meshVertices = Meshes.GetMeshVertices(Type);
