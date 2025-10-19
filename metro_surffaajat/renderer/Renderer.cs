@@ -95,7 +95,7 @@ public class Renderer<TLayerEnum>
     /// <param name="model">Model to be rendered</param>
     /// <param name="layer">Layer the model is rendered to</param>
     /// <exception cref="InvalidOperationException">Frame must be started with BeginRender before rendering Models</exception>
-    public void Submit(ref Model model, TLayerEnum layer)
+    public void Submit(ref readonly Model model, TLayerEnum layer)
     {
         if (_camera == null)
         {
