@@ -17,6 +17,7 @@ public enum ModelType
     DualCube,
     TrainCargoFront,
     TrainCargo,
+    Coin,
     Invalid,
 }
 
@@ -188,7 +189,7 @@ internal class SubModel
 
 
 /// @author Tuisku Tynkkynen
-/// @version 17.10.2025
+/// @version 19.10.2025
 /// <summary>
 /// Owns model data and provides getters for querying data by ModelType. 
 /// </summary>
@@ -224,10 +225,14 @@ internal static class ModelData
             new SubModel(MeshType.TrainTopFront,  new Color(112, 161, 179), position: OffsetTop + OffsetFront),
         ] },
         { ModelType.TrainCargo, [                                                                                    
-            new SubModel(MeshType.TrainBase,  new Color(34, 66, 88), position: new Vector3D<float>(0.0f, -0.45f, 0.0f)),        
+            new SubModel(MeshType.TrainBase,  new Color(34, 66, 88), position: OffsetBase),        
             new SubModel(MeshType.TrainBody, new Color(44, 101, 128)),                                                           
             new SubModel(MeshType.TrainTrim, new Color(112, 161, 179)),          
-            new SubModel(MeshType.TrainTop,  new Color(112, 161, 179), position: new Vector3D<float>(0.0f, 0.45f, 0.0f)),          
+            new SubModel(MeshType.TrainTop,  new Color(112, 161, 179), position: OffsetTop),
+        ] },
+        { ModelType.Coin, [                                                                                    
+            new SubModel(MeshType.CoinInner, new Color(220, 150, 10), scale: new Vector3D<float>(0.1875f)),                                                                
+            new SubModel(MeshType.CoinOuter, new Color(240, 210, 55), scale: new Vector3D<float>(0.25f)),                                                                
         ] },
     };
 

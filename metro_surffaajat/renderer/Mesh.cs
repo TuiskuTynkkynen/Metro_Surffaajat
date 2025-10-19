@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Jypeli;
 using Silk.NET.Maths;
 
@@ -22,12 +23,15 @@ public enum MeshType
     TrainTopFront,
     TrainTrimFront,
     
+    CoinInner,
+    CoinOuter,
+    
     Invalid
 }
 
 
 /// @author Tuisku Tynkkynen
-/// @version 17.10.2025
+/// @version 19.10.2025
 /// <summary>
 /// Owns mesh data and provides getters for querying data by MeshType. 
 /// </summary>
@@ -256,6 +260,63 @@ public static class Meshes
                     new IndexTriangle(4, 5, 6),
                     new IndexTriangle(6, 7, 4),
                 ],
+        } },
+        { MeshType.CoinInner, new MeshData {
+                Vertices = Enumerable.Range(0, 10)
+                    .Select(index => {
+                                float angle = float.DegreesToRadians(90.0f + index * (360.0f / 5));
+                                return new Vector3D<float>(float.Cos(angle), float.Sin(angle), index >= 5 ? -0.1f : 0.1f);
+                    }).ToArray(),
+                
+                VertexIndices = [
+                    // Front
+                    new IndexTriangle(0, 1, 2),
+                    new IndexTriangle(2, 3, 0),
+                    new IndexTriangle(3, 4, 0),
+                    
+                    // Back
+                    new IndexTriangle(5, 6, 7),
+                    new IndexTriangle(7, 8, 5),
+                    new IndexTriangle(8, 9, 5),
+                    
+                    // Left
+                    new IndexTriangle(0, 1, 5),
+                    new IndexTriangle(5, 6, 1),
+                    
+                    // Right
+                    new IndexTriangle(0, 4, 5),
+                    new IndexTriangle(5, 9, 4),
+                    
+                    // Down
+                    new IndexTriangle(2, 3, 7),
+                    new IndexTriangle(7, 8, 3),
+                ],
+        } },
+        { MeshType.CoinOuter, new MeshData {
+                Vertices = Enumerable.Range(0, 20)
+                    .Select(index => {
+                        float angle = float.DegreesToRadians((int)(index / 4)  * (360.0f / 5) + 90.0f);
+                        float radius = index % 4 < 2 ? 0.75f : 1.0f;
+                        return new Vector3D<float>(float.Cos(angle) * radius, float.Sin(angle) * radius, index % 2 == 1 ? -0.1f : 0.1f); })
+                    .ToArray(),
+                
+                VertexIndices = Enumerable.Range(0, 5)
+                    .SelectMany(i => {
+                        int offset = i * 4;
+                        return new IndexTriangle[] {
+                            // Front 
+                            new (offset + 0, offset + 2, (offset + 4) % 20),
+                            new (offset + 2, (offset + 4) % 20, (offset + 6) % 20),
+                            
+                            // Back
+                            new (offset + 1, offset + 3, (offset + 5) % 20),
+                            new (offset + 3, (offset + 5) % 20, (offset + 7) % 20),   
+                            
+                            // Up 
+                            new (offset + 2, offset + 3, (offset + 6) % 20),
+                            new (offset + 3, (offset + 6) % 20, (offset + 7) % 20),    
+                        }; })
+                    .ToArray(),
         } },
     };
 
