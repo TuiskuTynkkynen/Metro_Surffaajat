@@ -1,8 +1,8 @@
+using System.Diagnostics;
 using System.Linq;
 using Jypeli;
 using Metro_Surffaajat.renderer;
 using Metro_Surffaajat.utility;
-using Silk.NET.Maths;
 
 namespace Metro_Surffaajat.game;
 
@@ -21,7 +21,7 @@ public class Level
     /// <summary>
     /// Buffer of obstacles.
     /// </summary>
-    private readonly CircularBuffer<ObstacleType[]> _obstacles;
+    private readonly CircularBuffer<TrackSegment> _tracks;
     /// <summary>
     /// The offset of obstacle positions used to achieve smooth scrolling.
     /// In range from 0.0 to 1.0.
@@ -36,13 +36,13 @@ public class Level
     public Level(int size = 10)
     {
         _size = size;
-        _obstacles = new CircularBuffer<ObstacleType[]>(size);
+        _tracks = new CircularBuffer<TrackSegment>(size);
         
-        _obstacles.Add([ObstacleType.None, ObstacleType.None, ObstacleType.None]);
+        _tracks.Add(new TrackSegment());
 
-        while (_obstacles.Count < size)
+        while (_tracks.Count < size)
         {
-            _obstacles.Add(Next(_obstacles.Back()));
+            _tracks.Add(_tracks.Back().GetNext());
         }
     }
 
@@ -59,11 +59,11 @@ public class Level
         {
             _positionOffset -= 1.0f;
             
-            var next = Next(_obstacles.Back());
-            _obstacles.Add(next);
+            var next = _tracks.Back().GetNext();
+            _tracks.Add(next);
         }
     }
-    
+
     
     /// <summary>
     /// Renders all obstacles in the Level.
@@ -74,45 +74,25 @@ public class Level
         float z = -_size + _positionOffset;
         
         // Enumerate in reverse for back to front draw order 
-        foreach (ObstacleType[] track in _obstacles.Reverse())
+        foreach (var trackSegment in _tracks.Reverse())
         {
             z += 1.0f;
-            
-            for (int i = 0; i < track.Length; i++)
+
+            var models = trackSegment.GetModels();
+            while (models.MoveNext())
             {
-                // Iterate over the array from the outermost elements to the
-                // innermost i.e. first the left obstacle, then the right one
-                // and the middle one last. This is done to ensure the correct
-                // draw order
-                int index = i % 2 == 0? i / 2: track.Length - i / 2 - 1;
-                int x = index - track.Length / 2;
-                
-                Model model = new Model(Obstacles.GetModelType(track[index]))
+                if (models.Current == null)
                 {
-                    Position = new Vector3D<float>(x, 0, z),
-                    Tint = Utility.Lerp(Color.White, Color.SkyBlue, (double)z / (-_size + 1))
-                };
+                    Debug.Fail("All models should be valid");
+                    continue;
+                }
+
+                Model model = models.Current;
+                models.Current.Position.Z = z;
+                models.Current.Tint = Utility.Lerp(Color.White, Color.SkyBlue, (double)z / (-_size + 1));
 
                 renderer.Submit(ref model, RenderLayers.Default);
             }
         }
-    }
-    
-
-    /// <summary>
-    /// Calculates a new row of obstacles based on specified current row.
-    /// </summary>
-    /// <param name="current">The current row of obstacles</param>
-    /// <returns>The next row of obstacles</returns>
-    private static ObstacleType[] Next(ObstacleType[] current)
-    {
-        ObstacleType[] result = new ObstacleType[current.Length];
-
-        for (int i = 0; i < current.Length; i++)
-        {
-            result[i] = Obstacles.GetNextObstacle(current[i]);
-        }
-
-        return result;
     }
 }

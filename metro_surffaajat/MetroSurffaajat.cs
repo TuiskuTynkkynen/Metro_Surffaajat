@@ -42,8 +42,7 @@ public class MetroSurffaajat : PhysicsGame
         BoundingRectangle normalizedDeviceCoordinates = new BoundingRectangle(0, 0, 2, 2);
         Camera.ZoomTo(normalizedDeviceCoordinates);
         
-        _renderer = new Renderer<RenderLayers>(() => CreateGameObjectArray(32));
-        _level = new game.Level();
+        _renderer = new Renderer<RenderLayers>(() => CreateGameObjectArray(256));
         
         Keyboard.Listen(Key.Escape, ButtonState.Pressed, ConfirmExit, "Lopeta peli");
     }
