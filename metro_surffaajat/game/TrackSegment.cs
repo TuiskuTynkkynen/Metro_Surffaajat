@@ -1,8 +1,94 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using Silk.NET.Maths;
+using Metro_Surffaajat.renderer;
 
 namespace Metro_Surffaajat.game;
+
+/// <summary>
+/// Represents a segment of track with obstacles and coins.
+/// </summary>
+public class TrackSegment
+{
+    /// <summary>
+    /// The obstacles in the TrackSegment
+    /// </summary>
+    public readonly ObstacleSegment Obstacles;
+    /// <summary>
+    /// The coins in the TrackSegment
+    /// </summary>
+    public readonly CoinSegment Coins;
+    
+    
+    /// <summary>
+    /// Crates a TrackSegment.
+    /// </summary>
+    public TrackSegment()
+    {
+        Obstacles = new ObstacleSegment();
+        Coins = new CoinSegment();
+    }
+    
+    /// <summary>
+    /// Creates a TrackSegment with specifies obstacles and coins.
+    /// </summary>
+    /// <param name="obstacles">Obstacles in the segment</param>
+    /// <param name="coins">Coins in the segment</param>
+    private TrackSegment(ObstacleSegment obstacles, CoinSegment coins)
+    {
+        Coins = coins;
+        Obstacles = obstacles;
+    }
+
+    
+    /// <summary>
+    /// Gets an enumerator that iterates over all the models of the obstacles
+    /// and coins in this segment in the correct draw order. 
+    /// </summary>
+    /// <returns>Enumerator to the models of this segment</returns>
+    public IEnumerator<Model> GetModels()
+    {
+        int lenght = int.Min(Obstacles.Length, Coins.Length);
+        
+        for (int i = 0; i < lenght; i++)
+        {
+            // Iterate over the arrays from the outermost elements to the
+            // innermost i.e. first the left obstacle, then the right one
+            // and the middle one last. This is done to ensure the correct
+            // draw order
+            int index = i % 2 == 0? i / 2: lenght- i / 2 - 1;
+            int x = index - Obstacles.Length / 2;
+            
+            yield return new Model(game.Obstacles.GetModelType(Obstacles[(uint)index])) {
+                Position = new Vector3D<float>(x, 0, 0),
+            };
+
+            Vector3D<float>? coinPosition = CoinTrails.CalculatePosition(Coins[(uint)index], Coins.SegmentIndex);
+            if (Coins[(uint)index] != CoinTrailType.None && coinPosition.HasValue)
+            {
+                yield return new Model(CoinTrails.ModelType) {
+                    Position = new Vector3D<float>(coinPosition.Value.X + x, coinPosition.Value.Y, coinPosition.Value.Z),
+                };
+            }
+        }
+    }
+    
+    
+    /// <summary>
+    /// Calculates the following TrackSegment for this segment.
+    /// </summary>
+    /// <returns>The next TrackSegment</returns>
+    public TrackSegment GetNext()
+    {
+        ObstacleSegment nextObstacles = Obstacles.GetNext();
+        CoinSegment nextCoins = Coins.GetNext(nextObstacles);
+
+        return new TrackSegment(nextObstacles, nextCoins);
+    }
+}
+
 
 /// <summary>
 /// Structure for storing a segment of obstacles.
