@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using Jypeli;
@@ -22,28 +23,29 @@ public enum ObstacleType
 
 
 /// @author Tuisku Tynkkynen
-/// @version 17.10.2025
+/// @version 19.10.2025
 /// <summary>
 /// Owns obstacle data and provides getters for querying data by ObstacleType. 
 /// </summary>
 public static class Obstacles
 {
     /// @author Tuisku Tynkkynen
-    /// @version 16.10.2025
+    /// @version 19.10.2025
     /// <summary>
-    /// Structure for storing obstacle related data-
+    /// Structure for storing obstacle related data.
     /// </summary>
     /// <param name="modelType">Type of Model associated with obstacle</param>
     /// <param name="bounds">AABB of the obstacle</param>
+    /// <param name="minRepeat">The minimum number of times this ObstacleType is repeated</param>
     /// <param name="continueChance">How likely the next obstacle is to have the same ObstacleType</param>
     /// <param name="validNext">Array of ObstacleTypes that can follow this ObstacleType</param>
-    private readonly struct ObstacleData(ModelType modelType, BoundingCuboid<float> bounds, float continueChance, ObstacleType[] validNext)
+    private readonly struct ObstacleData(ModelType modelType, BoundingCuboid<float> bounds, uint minRepeat, float continueChance, ObstacleType[] validNext)
     {   
         public readonly ModelType ModelType = modelType;
         public readonly BoundingCuboid<float> Bounds = bounds;
+        public readonly uint MinRepeat = minRepeat;
         public readonly float ContinueChance = continueChance;
         public readonly ObstacleType[] ValidNext = validNext;
-
     }
         
     
@@ -51,10 +53,10 @@ public static class Obstacles
     /// Map from ObstacleType to ObstacleData.
     /// </summary>
     private static readonly Dictionary<ObstacleType, ObstacleData> ObstacleDataMap = new(){
-        {ObstacleType.None, new (ModelType.Invalid, new BoundingCuboid<float>(), 0.75f, [ObstacleType.TrainStart])},
-        {ObstacleType.TrainStart, new (ModelType.TrainCargoFront, new (Vector3D<float>.One), 0.0f, [ObstacleType.Train])},
-        {ObstacleType.Train, new (ModelType.TrainCargo, new (Vector3D<float>.One), 0.75f, [ObstacleType.TrainEnd])},
-        {ObstacleType.TrainEnd, new (ModelType.TrainCargo, new (Vector3D<float>.One), 0.0f, [ObstacleType.None])},
+        {ObstacleType.None, new (ModelType.Invalid, new BoundingCuboid<float>(), 3, 0.75f, [ObstacleType.TrainStart])},
+        {ObstacleType.TrainStart, new (ModelType.TrainCargoFront, new (Vector3D<float>.One), 1, 0.0f, [ObstacleType.Train])},
+        {ObstacleType.Train, new (ModelType.TrainCargo, new (Vector3D<float>.One), 2, 0.75f, [ObstacleType.TrainEnd])},
+        {ObstacleType.TrainEnd, new (ModelType.TrainCargo, new (Vector3D<float>.One), 3, 0.0f, [ObstacleType.None])},
     };
     
     
@@ -97,7 +99,7 @@ public static class Obstacles
     /// </summary>
     /// <param name="current">Type of current obstacle</param>
     /// <returns>Type of the next obstacle</returns>
-    public static ObstacleType GetNextObstacle(ObstacleType current)
+    public static ObstacleType GetNext(ObstacleType current, uint segmentIndex)
     {
         if (current >= ObstacleType.Invalid)
         {
@@ -105,7 +107,7 @@ public static class Obstacles
             return ObstacleType.None;
         }
 
-        if (RandomGen.NextDouble(0.0, 1.0) <= ObstacleDataMap[current].ContinueChance)
+        if (segmentIndex < ObstacleDataMap[current].MinRepeat || RandomGen.NextDouble(0.0, 1.0) <= ObstacleDataMap[current].ContinueChance)
         {
             return current;
         }

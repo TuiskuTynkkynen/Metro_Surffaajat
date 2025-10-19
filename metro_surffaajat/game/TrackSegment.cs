@@ -166,7 +166,7 @@ public class ObstacleSegment
         
         for (int i = 0; i < Capacity; i++)
         {
-            nextObstacles[i] = Obstacles.GetNext(_obstacles[i]);
+            nextObstacles[i] = Obstacles.GetNext(_obstacles[i], _segmentIndices[i]);
             nextIndices[i] = nextObstacles[i] == _obstacles[i] ? _segmentIndices[i] + 1 : 0;
         }
 
