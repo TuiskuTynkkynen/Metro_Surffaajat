@@ -6,9 +6,8 @@ using Metro_Surffaajat.utility;
 
 namespace Metro_Surffaajat.game;
 
-
 /// @author Tuisku Tynkkynen
-/// @version 16.10.2025
+/// @version 19.10.2025
 /// <summary>
 /// Game level class. Owns and manages obstacles. 
 /// </summary>
@@ -84,7 +83,6 @@ public class Level
                 if (models.Current == null)
                 {
                     Debug.Fail("All models should be valid");
-                    continue;
                 }
 
                 Model model = models.Current;

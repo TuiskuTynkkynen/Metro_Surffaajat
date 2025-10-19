@@ -7,6 +7,8 @@ using Metro_Surffaajat.renderer;
 
 namespace Metro_Surffaajat.game;
 
+/// @author Tuisku Tynkkynen
+/// @version 19.10.2025
 /// <summary>
 /// Represents a segment of track with obstacles and coins.
 /// </summary>
@@ -90,6 +92,8 @@ public class TrackSegment
 }
 
 
+/// @author Tuisku Tynkkynen
+/// @version 19.10.2025
 /// <summary>
 /// Structure for storing a segment of obstacles.
 /// </summary>
@@ -175,7 +179,8 @@ public class ObstacleSegment
 }
 
 
-
+/// @author Tuisku Tynkkynen
+/// @version 19.10.2025
 /// <summary>
 /// Structure for storing a segment of coins.
 /// </summary>

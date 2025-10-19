@@ -16,7 +16,7 @@ public enum RenderLayers
 
 
 /// @author Tuisku Tynkkynen
-/// @version 16.10.2025
+/// @version 19.10.2025
 /// <summary>
 /// The main game class.
 /// Owns game state and controls updating state.

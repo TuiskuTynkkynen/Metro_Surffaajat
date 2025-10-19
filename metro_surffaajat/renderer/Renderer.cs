@@ -5,7 +5,7 @@ using Jypeli;
 namespace Metro_Surffaajat.renderer;
 
 /// @author Tuisku Tynkkynen
-/// @version 15.10.2025
+/// @version 19.10.2025
 /// <summary>
 /// Collection of RenderBuffers used as render layers.
 /// Automates RenderBuffer management.
